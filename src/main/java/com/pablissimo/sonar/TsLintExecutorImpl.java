@@ -20,22 +20,26 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         Command command =
                 Command
                 .create("node")
-                .addArgument('"' + pathToTsLint + '"')
+                .addArgument(escape(pathToTsLint))
                 .addArgument("--format")
                 .addArgument("json");
 
         if (rulesDir != null && rulesDir.length() > 0) {
             command
                 .addArgument("--rules-dir")
-                .addArgument('"' + rulesDir + '"');
+                .addArgument(escape(rulesDir));
         }
 
         command
             .addArgument("--config")
-            .addArgument('"' + configFile + '"')
+            .addArgument(escape(configFile))
             .setNewShell(false);
 
         return command;
+    }
+
+    private static final String escape(String str){
+        return str.replaceAll("\\s+","\" \"");
     }
 
     public String execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs) {
@@ -50,7 +54,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         int currentBatchLength = 0;
         for (int i = 0; i < files.size(); i++) {
-            String nextPath = '"' + files.get(i).trim() + '"';
+            String nextPath = escape(files.get(i).trim());
 
             // +1 for the space we'll be adding between filenames
             if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {

@@ -42,14 +42,14 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", "path/to/rules", Arrays.asList(new String[] { "path/to/file", "path/to/another" }), 40000);
+        this.executorImpl.execute("path/to space/tslint", "path/to/config", "path/to/rules", Arrays.asList(new String[] { "path/to/file", "path/to/another" }), 40000);
         
         assertEquals(1, capturedCommands.size());
         
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
         
-        assertEquals("node \"path/to/tslint\" --format json --rules-dir \"path/to/rules\" --config \"path/to/config\" \"path/to/file\" \"path/to/another\"", theCommand.toCommandLine());
+        assertEquals("node path/to\" \"space/tslint --format json --rules-dir path/to/rules --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
         // Expect one timeout period per file processed
         assertEquals(2 * 40000, theTimeout);        
     }
@@ -128,7 +128,7 @@ public class TsLintExecutorImplTest {
         
         Command theSecondCommand = capturedCommands.get(1);
         
-        assertFalse(theSecondCommand.toCommandLine().contains("first batch"));
-        assertTrue(theSecondCommand.toCommandLine().contains("second batch"));
+        assertFalse(theSecondCommand.toCommandLine().contains("first\" \"batch"));
+        assertTrue(theSecondCommand.toCommandLine().contains("second\" \"batch"));
     }
 }
